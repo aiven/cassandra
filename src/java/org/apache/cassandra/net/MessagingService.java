@@ -704,7 +704,7 @@ public final class MessagingService implements MessagingServiceMBean
             logger.info("Starting Encrypted Messaging Service on SSL port {}", DatabaseDescriptor.getSSLStoragePort());
         }
 
-        if (DatabaseDescriptor.getServerEncryptionOptions().internode_encryption != ServerEncryptionOptions.InternodeEncryption.all)
+        if (DatabaseDescriptor.shouldListenOnStoragePort())
         {
             ServerSocketChannel serverChannel = null;
             try
