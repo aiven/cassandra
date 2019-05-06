@@ -2111,6 +2111,14 @@ public class DatabaseDescriptor
         return conf.server_encryption_options;
     }
 
+    public static boolean shouldListenOnStoragePort() {
+        if (conf.listen_on_storage_port == null)
+            return getServerEncryptionOptions().internode_encryption != EncryptionOptions.ServerEncryptionOptions.InternodeEncryption.all;
+        else {
+            return conf.listen_on_storage_port;
+        }
+    }
+
     public static EncryptionOptions.ClientEncryptionOptions getClientEncryptionOptions()
     {
         return conf.client_encryption_options;
