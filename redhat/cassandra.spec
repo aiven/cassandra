@@ -11,6 +11,7 @@
 %define relname apache-cassandra-%{version}
 
 Name:          cassandra
+Epoch:         %{epoch}
 Version:       %{version}
 Release:       %{revision}
 Summary:       Cassandra is a highly scalable, eventually consistent, distributed, structured key-value store.
