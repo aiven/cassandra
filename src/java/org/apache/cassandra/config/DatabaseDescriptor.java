@@ -2099,6 +2099,14 @@ public class DatabaseDescriptor
         }
     }
 
+    public static boolean shouldListenOnSslStoragePort() {
+        if (conf.listen_on_ssl_storage_port == null)
+            return getServerEncryptionOptions().internode_encryption != EncryptionOptions.ServerEncryptionOptions.InternodeEncryption.none;
+        else {
+            return conf.listen_on_ssl_storage_port;
+        }
+    }
+
     public static EncryptionOptions.ClientEncryptionOptions getClientEncryptionOptions()
     {
         return conf.client_encryption_options;

@@ -239,6 +239,7 @@ public class Config
     // this encOptions is for backward compatibility (a warning is logged by DatabaseDescriptor)
     public EncryptionOptions.ServerEncryptionOptions encryption_options;
     public Boolean listen_on_storage_port;
+    public Boolean listen_on_ssl_storage_port;
 
     public InternodeCompression internode_compression = InternodeCompression.none;
 
