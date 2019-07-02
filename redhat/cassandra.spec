@@ -158,7 +158,7 @@ exit 0
 %package tools
 Summary:       Extra tools for Cassandra. Cassandra is a highly scalable, eventually consistent, distributed, structured key-value store.
 Group:         Development/Libraries
-Requires:      cassandra = %{version}-%{revision}
+Requires:      cassandra = %{epoch}:%{version}-%{revision}
 
 %description tools
 Cassandra is a distributed (peer-to-peer) system for the management and storage of structured data.
