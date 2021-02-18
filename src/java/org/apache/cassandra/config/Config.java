@@ -240,6 +240,7 @@ public class Config
     public EncryptionOptions.ServerEncryptionOptions encryption_options;
     public Boolean listen_on_storage_port;
     public Boolean listen_on_ssl_storage_port;
+    public Boolean external_addressing_mode;
 
     public InternodeCompression internode_compression = InternodeCompression.none;
 

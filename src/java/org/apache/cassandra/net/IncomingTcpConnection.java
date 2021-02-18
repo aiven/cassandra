@@ -160,7 +160,9 @@ public class IncomingTcpConnection extends FastThreadLocalThread implements Clos
         {
             logger.warn("Peer {} attempted to establish an unencrypted connection (broadcast address {})",
                         socket.getRemoteSocketAddress(), from);
-            throw new IOException("Peer " + from + " attempted an unencrypted connection");
+            if (DatabaseDescriptor.isExternalAddressingMode()) {
+                throw new IOException("Peer " + from + " attempted an unencrypted streaming connection");
+            }
         }
 
         // record the (true) version of the endpoint
