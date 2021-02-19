@@ -72,7 +72,9 @@ public class IncomingStreamingConnection extends Thread implements Closeable
             {
                 logger.warn("Peer {} attempted to establish an unencrypted streaming connection (broadcast address {})",
                             socket.getRemoteSocketAddress(), init.from);
-                throw new IOException("Peer " + init.from + " attempted an unencrypted streaming connection");
+                if (DatabaseDescriptor.isExternalAddressingMode()) {
+                    throw new IOException("Peer " + init.from + " attempted an unencrypted streaming connection");
+                }
             }
 
             //Set SO_TIMEOUT on follower side

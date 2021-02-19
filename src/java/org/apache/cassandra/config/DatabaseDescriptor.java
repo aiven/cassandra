@@ -2119,6 +2119,12 @@ public class DatabaseDescriptor
         }
     }
 
+    public static boolean isExternalAddressingMode() {
+        if (conf.external_addressing_mode == null)
+            return false;
+        return conf.external_addressing_mode;
+    }
+
     public static boolean shouldListenOnSslStoragePort() {
         if (conf.listen_on_ssl_storage_port == null)
             return getServerEncryptionOptions().internode_encryption != EncryptionOptions.ServerEncryptionOptions.InternodeEncryption.none;
