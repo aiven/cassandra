@@ -10,7 +10,7 @@
 
 %define relname apache-cassandra-%{version}
 
-Name:          cassandra
+Name:          cassandra3
 Epoch:         %{epoch}
 Version:       %{version}
 Release:       %{revision}
@@ -158,7 +158,7 @@ exit 0
 %package tools
 Summary:       Extra tools for Cassandra. Cassandra is a highly scalable, eventually consistent, distributed, structured key-value store.
 Group:         Development/Libraries
-Requires:      cassandra = %{epoch}:%{version}-%{revision}
+Requires:      cassandra3 = %{epoch}:%{version}-%{revision}
 
 %description tools
 Cassandra is a distributed (peer-to-peer) system for the management and storage of structured data.
