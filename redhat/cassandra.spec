@@ -69,7 +69,7 @@ Cassandra is a distributed (peer-to-peer) system for the management and storage 
 %build
 export LANG=en_US.UTF-8
 export JAVA_TOOL_OPTIONS="-Dfile.encoding=UTF-8"
-ant clean jar -Dversion=%{upstream_version}
+ant clean jar -Dversion=%{upstream_version} -Drat.skip=true
 
 %install
 %{__rm} -rf %{buildroot}
