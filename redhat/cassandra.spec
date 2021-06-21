@@ -32,9 +32,10 @@
 %define upstream_version %(echo %{version} | sed -r 's/~/-/g')
 %define relname apache-cassandra-%{upstream_version}
 
-Name:          cassandra
+Name:          cassandra4
 Version:       %{version}
 Release:       %{revision}
+Epoch:         %{epoch}
 Summary:       Cassandra is a highly scalable, eventually consistent, distributed, structured key-value store.
 
 Group:         Development/Libraries
@@ -182,7 +183,7 @@ exit 0
 %package tools
 Summary:       Extra tools for Cassandra. Cassandra is a highly scalable, eventually consistent, distributed, structured key-value store.
 Group:         Development/Libraries
-Requires:      cassandra = %{version}-%{revision}
+Requires:      cassandra4 = %{epoch}:%{version}-%{revision}
 
 %description tools
 Cassandra is a distributed (peer-to-peer) system for the management and storage of structured data.
