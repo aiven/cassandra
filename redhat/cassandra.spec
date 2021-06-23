@@ -30,6 +30,7 @@ Requires:      python(abi) >= 2.7
 Requires(pre): user(cassandra)
 Requires(pre): group(cassandra)
 Requires(pre): shadow-utils
+Conflicts:     cassandra
 Provides:      user(cassandra)
 Provides:      group(cassandra)
 
@@ -159,6 +160,7 @@ exit 0
 Summary:       Extra tools for Cassandra. Cassandra is a highly scalable, eventually consistent, distributed, structured key-value store.
 Group:         Development/Libraries
 Requires:      cassandra3 = %{epoch}:%{version}-%{revision}
+Conflicts:     cassandra-tools
 
 %description tools
 Cassandra is a distributed (peer-to-peer) system for the management and storage of structured data.
