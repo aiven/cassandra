@@ -53,6 +53,8 @@ Requires:      procps-ng >= 3.3
 Requires(pre): user(cassandra)
 Requires(pre): group(cassandra)
 Requires(pre): shadow-utils
+Conflicts:     cassandra
+Conflicts:     cassandra3
 Provides:      user(cassandra)
 Provides:      group(cassandra)
 
@@ -184,6 +186,8 @@ exit 0
 Summary:       Extra tools for Cassandra. Cassandra is a highly scalable, eventually consistent, distributed, structured key-value store.
 Group:         Development/Libraries
 Requires:      cassandra4 = %{epoch}:%{version}-%{revision}
+Conflicts:     cassandra-tools
+Conflicts:     cassandra3-tools
 
 %description tools
 Cassandra is a distributed (peer-to-peer) system for the management and storage of structured data.
