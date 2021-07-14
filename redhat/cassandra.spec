@@ -9,8 +9,9 @@
 %global username cassandra
 
 %define relname apache-cassandra-%{version}
+%define cassandraX cassandra3
 
-Name:          cassandra3
+Name:          %{cassandraX}
 Epoch:         %{epoch}
 Version:       %{version}
 Release:       %{revision}
@@ -52,20 +53,22 @@ ant clean jar -Dversion=%{version}
 
 %install
 %{__rm} -rf %{buildroot}
-mkdir -p %{buildroot}/%{_sysconfdir}/%{username}
-mkdir -p %{buildroot}/usr/share/%{username}
-mkdir -p %{buildroot}/usr/share/%{username}/lib
-mkdir -p %{buildroot}/%{_sysconfdir}/%{username}/default.conf
+mkdir -p %{buildroot}/%{_sysconfdir}/%{cassandraX}
+mkdir -p %{buildroot}/usr/share/%{cassandraX}
+mkdir -p %{buildroot}/usr/share/%{cassandraX}/bin
+mkdir -p %{buildroot}/usr/share/%{cassandraX}/sbin
+mkdir -p %{buildroot}/usr/share/%{cassandraX}/lib
+mkdir -p %{buildroot}/%{_sysconfdir}/%{cassandraX}/default.conf
 mkdir -p %{buildroot}/%{_sysconfdir}/rc.d/init.d
 mkdir -p %{buildroot}/%{_sysconfdir}/security/limits.d
 mkdir -p %{buildroot}/%{_sysconfdir}/default
 mkdir -p %{buildroot}/usr/sbin
 mkdir -p %{buildroot}/usr/bin
-mkdir -p %{buildroot}/var/lib/%{username}/commitlog
-mkdir -p %{buildroot}/var/lib/%{username}/data
-mkdir -p %{buildroot}/var/lib/%{username}/saved_caches
-mkdir -p %{buildroot}/var/lib/%{username}/hints
-mkdir -p %{buildroot}/var/run/%{username}
+mkdir -p %{buildroot}/var/lib/%{cassandraX}/commitlog
+mkdir -p %{buildroot}/var/lib/%{cassandraX}/data
+mkdir -p %{buildroot}/var/lib/%{cassandraX}/saved_caches
+mkdir -p %{buildroot}/var/lib/%{cassandraX}/hints
+mkdir -p %{buildroot}/var/run/%{cassandraX}
 mkdir -p %{buildroot}/var/log/%{username}
 ( cd pylib && python2.7 setup.py install --no-compile --root %{buildroot}; )
 
@@ -86,28 +89,28 @@ rm -f tools/bin/*.bat
 rm -f tools/bin/cassandra.in.sh
 
 # copy default configs
-cp -pr conf/* %{buildroot}/%{_sysconfdir}/%{username}/default.conf/
+cp -pr conf/* %{buildroot}/%{_sysconfdir}/%{cassandraX}/default.conf/
 
 # step on default config with our redhat one
-cp -p redhat/%{username}.in.sh %{buildroot}/usr/share/%{username}/%{username}.in.sh
-cp -p redhat/%{username} %{buildroot}/%{_sysconfdir}/rc.d/init.d/%{username}
-cp -p redhat/%{username}.conf %{buildroot}/%{_sysconfdir}/security/limits.d/
-cp -p redhat/default %{buildroot}/%{_sysconfdir}/default/%{username}
+cp -p redhat/%{username}.in.sh %{buildroot}/usr/share/%{cassandraX}/%{username}.in.sh
+cp -p redhat/%{username} %{buildroot}/%{_sysconfdir}/rc.d/init.d/%{cassandraX}
+cp -p redhat/%{username}.conf %{buildroot}/%{_sysconfdir}/security/limits.d/{cassandraX}.conf
+cp -p redhat/default %{buildroot}/%{_sysconfdir}/default/%{cassandraX}
 
 # copy cassandra bundled libs
-cp -pr lib/* %{buildroot}/usr/share/%{username}/lib/
+cp -pr lib/* %{buildroot}/usr/share/%{cassandraX}/lib/
 
 # copy stress jar
-cp -p build/tools/lib/stress.jar %{buildroot}/usr/share/%{username}/
+cp -p build/tools/lib/stress.jar %{buildroot}/usr/share/%{cassandraX}/
 
 # copy binaries
-mv bin/cassandra %{buildroot}/usr/sbin/
-cp -p bin/* %{buildroot}/usr/bin/
-cp -p tools/bin/* %{buildroot}/usr/bin/
+mv bin/cassandra %{buildroot}/usr/share/%{cassandraX}/sbin
+cp -p bin/* %{buildroot}/usr/share/%{cassandraX}/bin
+cp -p tools/bin/* %{buildroot}/usr/share/%{cassandraX}/bin
 
 # copy cassandra, thrift jars
-cp build/apache-cassandra-%{version}.jar %{buildroot}/usr/share/%{username}/
-cp build/apache-cassandra-thrift-%{version}.jar %{buildroot}/usr/share/%{username}/
+cp build/apache-cassandra-%{version}.jar %{buildroot}/usr/share/%{cassandraX}/
+cp build/apache-cassandra-thrift-%{version}.jar %{buildroot}/usr/share/%{cassandraX}/
 
 %clean
 %{__rm} -rf %{buildroot}
@@ -121,31 +124,50 @@ exit 0
 %files
 %defattr(0644,root,root,0755)
 %doc CHANGES.txt LICENSE.txt README.asc NEWS.txt NOTICE.txt CASSANDRA-14092.txt
-%attr(755,root,root) %{_bindir}/cassandra-stress
-%attr(755,root,root) %{_bindir}/cqlsh
-%attr(755,root,root) %{_bindir}/cqlsh.py
-%attr(755,root,root) %{_bindir}/debug-cql
-%attr(755,root,root) %{_bindir}/nodetool
-%attr(755,root,root) %{_bindir}/sstableloader
-%attr(755,root,root) %{_bindir}/sstablescrub
-%attr(755,root,root) %{_bindir}/sstableupgrade
-%attr(755,root,root) %{_bindir}/sstableutil
-%attr(755,root,root) %{_bindir}/sstableverify
-%attr(755,root,root) %{_bindir}/stop-server
-%attr(755,root,root) %{_sbindir}/cassandra
-%attr(755,root,root) /%{_sysconfdir}/rc.d/init.d/%{username}
-%{_sysconfdir}/default/%{username}
-%{_sysconfdir}/security/limits.d/%{username}.conf
-/usr/share/%{username}*
-%config(noreplace) /%{_sysconfdir}/%{username}
-%attr(755,%{username},%{username}) %config(noreplace) /var/lib/%{username}/*
-%attr(755,%{username},%{username}) /var/log/%{username}*
-%attr(755,%{username},%{username}) /var/run/%{username}*
+%attr(755,root,root) /usr/share/%{cassandraX}/bin/cassandra-stress
+%attr(755,root,root) /usr/share/%{cassandraX}/bin/cqlsh
+%attr(755,root,root) /usr/share/%{cassandraX}/bin/cqlsh.py
+%attr(755,root,root) /usr/share/%{cassandraX}/bin/debug-cql
+%attr(755,root,root) /usr/share/%{cassandraX}/bin/nodetool
+%attr(755,root,root) /usr/share/%{cassandraX}/bin/sstableloader
+%attr(755,root,root) /usr/share/%{cassandraX}/bin/sstablescrub
+%attr(755,root,root) /usr/share/%{cassandraX}/bin/sstableupgrade
+%attr(755,root,root) /usr/share/%{cassandraX}/bin/sstableutil
+%attr(755,root,root) /usr/share/%{cassandraX}/bin/sstableverify
+%attr(755,root,root) /usr/share/%{cassandraX}/bin/stop-server
+%attr(755,root,root) /usr/share/%{cassandraX}/sbin/cassandra
+%attr(755,root,root) /%{_sysconfdir}/rc.d/init.d/%{cassandraX}
+%{_sysconfdir}/default/%{cassandraX}
+%{_sysconfdir}/security/limits.d/%{cassandraX}.conf
+/usr/share/%{cassandraX}*
+%config(noreplace) /%{_sysconfdir}/%{cassandraX}
+%attr(755,%{username},%{username}) %config(noreplace) /var/lib/%{cassandraX}/*
+%attr(755,%{username},%{username}) /var/log/%{cassandraX}*
+%attr(755,%{username},%{username}) /var/run/%{cassandraX}*
 /usr/lib/python2.7/site-packages/cqlshlib/
 /usr/lib/python2.7/site-packages/cassandra_pylib*.egg-info
 
 %post
-alternatives --install /%{_sysconfdir}/%{username}/conf %{username} /%{_sysconfdir}/%{username}/default.conf/ 0
+alternatives --install /%{_sbindir}/cassandra cassandra /usr/share/%{cassandraX}/sbin/cassandra 0 \
+    --slave /%{_sysconfdir}/%{username} %{username}_conf /%{_sysconfdir}/%{cassandraX} \
+    --slave /usr/share/%{username} %{username}_share /usr/share/%{cassandraX} \
+    --slave /var/lib/%{username} %{username}_lib /var/lib/%{cassandraX} \
+    --slave /var/run/%{username} %{username}_run /var/run/%{cassandraX} \
+    --slave /%{_sysconfdir}/rc.d/init.d/%{username} %{username}_init /%{_sysconfdir}/rc.d/init.d/%{cassandraX} \
+    --slave /%{_sysconfdir}/security/limits.d/%{username}.conf %{username}_limits /%{_sysconfdir}/security/limits.d/{cassandraX}.conf \
+    --slave /%{_sysconfdir}/default/%{username} %{username}_default_conf /%{_sysconfdir}/default/%{username} \
+    --slave /usr/bin/cassandra-stress cassandra-stress /usr/share/%{cassandraX}/bin/cassandra-stress \
+    --slave /usr/bin/cqlsh cqlsh /usr/share/%{cassandraX}/bin/cqlsh \
+    --slave /usr/bin/cqlsh.py cqlsh.py /usr/share/%{cassandraX}/bin/cqlsh.py \
+    --slave /usr/bin/debug-cql debug-cql /usr/share/%{cassandraX}/bin/debug-cql \
+    --slave /usr/bin/nodetool nodetool /usr/share/%{cassandraX}/bin/nodetool \
+    --slave /usr/bin/sstableloader sstableloader /usr/share/%{cassandraX}/bin/sstableloader \
+    --slave /usr/bin/sstablescrub sstablescrub /usr/share/%{cassandraX}/bin/sstablescrub \
+    --slave /usr/bin/sstableupgrade sstableupgrade /usr/share/%{cassandraX}/bin/sstableupgrade \
+    --slave /usr/bin/sstableutil sstableutil /usr/share/%{cassandraX}/bin/sstableutil \
+    --slave /usr/bin/sstableverify sstableverify /usr/share/%{cassandraX}/bin/sstableverify \
+    --slave /usr/bin/stop-server stop-server /usr/share/%{cassandraX}/bin/stop-server
+alternatives --install /%{_sysconfdir}/%{username}/conf %{username}_conf /%{_sysconfdir}/%{username}/default.conf/ 0
 exit 0
 
 %preun
@@ -159,7 +181,7 @@ exit 0
 %package tools
 Summary:       Extra tools for Cassandra. Cassandra is a highly scalable, eventually consistent, distributed, structured key-value store.
 Group:         Development/Libraries
-Requires:      cassandra3 = %{epoch}:%{version}-%{revision}
+Requires:      %{cassandraX} = %{epoch}:%{version}-%{revision}
 Conflicts:     cassandra-tools
 
 %description tools
@@ -168,15 +190,15 @@ Cassandra is a distributed (peer-to-peer) system for the management and storage 
 This package contains extra tools for working with Cassandra clusters.
 
 %files tools
-%attr(755,root,root) %{_bindir}/sstabledump
-%attr(755,root,root) %{_bindir}/cassandra-stressd
-%attr(755,root,root) %{_bindir}/compaction-stress
-%attr(755,root,root) %{_bindir}/sstableexpiredblockers
-%attr(755,root,root) %{_bindir}/sstablelevelreset
-%attr(755,root,root) %{_bindir}/sstablemetadata
-%attr(755,root,root) %{_bindir}/sstableofflinerelevel
-%attr(755,root,root) %{_bindir}/sstablerepairedset
-%attr(755,root,root) %{_bindir}/sstablesplit
+%attr(755,root,root) /usr/share/%{cassandraX}/bin/sstabledump
+%attr(755,root,root) /usr/share/%{cassandraX}/bin/cassandra-stressd
+%attr(755,root,root) /usr/share/%{cassandraX}/bin/compaction-stress
+%attr(755,root,root) /usr/share/%{cassandraX}/bin/sstableexpiredblockers
+%attr(755,root,root) /usr/share/%{cassandraX}/bin/sstablelevelreset
+%attr(755,root,root) /usr/share/%{cassandraX}/bin/sstablemetadata
+%attr(755,root,root) /usr/share/%{cassandraX}/bin/sstableofflinerelevel
+%attr(755,root,root) /usr/share/%{cassandraX}/bin/sstablerepairedset
+%attr(755,root,root) /usr/share/%{cassandraX}/bin/sstablesplit
 
 
 %changelog
