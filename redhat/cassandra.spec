@@ -80,9 +80,6 @@ mkdir -p %{buildroot}/%{_sysconfdir}/%{username}
 mkdir -p %{buildroot}/usr/share/%{username}
 mkdir -p %{buildroot}/usr/share/%{username}/lib
 mkdir -p %{buildroot}/%{_sysconfdir}/%{username}/default.conf
-mkdir -p %{buildroot}/%{_sysconfdir}/rc.d/init.d
-mkdir -p %{buildroot}/%{_sysconfdir}/security/limits.d
-mkdir -p %{buildroot}/%{_sysconfdir}/default
 mkdir -p %{buildroot}/usr/sbin
 mkdir -p %{buildroot}/usr/bin
 mkdir -p %{buildroot}/var/lib/%{username}/commitlog
@@ -110,9 +107,6 @@ cp -pr conf/* %{buildroot}/%{_sysconfdir}/%{username}/default.conf/
 
 # step on default config with our redhat one
 cp -p redhat/%{username}.in.sh %{buildroot}/usr/share/%{username}/%{username}.in.sh
-cp -p redhat/%{username} %{buildroot}/%{_sysconfdir}/rc.d/init.d/%{username}
-cp -p redhat/%{username}.conf %{buildroot}/%{_sysconfdir}/security/limits.d/
-cp -p redhat/default %{buildroot}/%{_sysconfdir}/default/%{username}
 
 # copy cassandra bundled libs
 cp -pr lib/* %{buildroot}/usr/share/%{username}/lib/
@@ -159,9 +153,6 @@ exit 0
 %attr(755,root,root) %{_bindir}/sstableverify
 %attr(755,root,root) %{_bindir}/stop-server
 %attr(755,root,root) %{_sbindir}/cassandra
-%attr(755,root,root) /%{_sysconfdir}/rc.d/init.d/%{username}
-%{_sysconfdir}/default/%{username}
-%{_sysconfdir}/security/limits.d/%{username}.conf
 /usr/share/%{username}*
 %config(noreplace) /%{_sysconfdir}/%{username}
 %attr(755,%{username},%{username}) %config(noreplace) /var/lib/%{username}/*
