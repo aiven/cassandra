@@ -83,6 +83,7 @@ mkdir -p %{buildroot}/usr/share/%{cassandraX}/lib
 mkdir -p %{buildroot}/%{_sysconfdir}/%{cassandraX}/default.conf
 mkdir -p %{buildroot}/usr/%{cassandraX}/sbin
 mkdir -p %{buildroot}/usr/%{cassandraX}/bin
+mkdir -p %{buildroot}/usr/bin
 mkdir -p %{buildroot}/var/lib/%{cassandraX}/commitlog
 mkdir -p %{buildroot}/var/lib/%{cassandraX}/data
 mkdir -p %{buildroot}/var/lib/%{cassandraX}/saved_caches
@@ -123,6 +124,9 @@ mv bin/cassandra %{buildroot}/usr/%{cassandraX}/sbin/
 cp -p bin/* %{buildroot}/usr/%{cassandraX}/bin/
 cp -p tools/bin/* %{buildroot}/usr/%{cassandraX}/bin/
 
+# special handling for cqlsh: install it in /usr/bin because there's only one version of client installed
+mv %{buildroot}/usr/%{cassandraX}/bin/cqlsh* %{buildroot}/usr/bin/
+
 # copy cassandra jar
 cp build/apache-cassandra-%{upstream_version}.jar %{buildroot}/usr/share/%{cassandraX}/
 
@@ -141,8 +145,6 @@ exit 0
 %attr(755,root,root) /usr/%{cassandraX}/bin/auditlogviewer
 %attr(755,root,root) /usr/%{cassandraX}/bin/jmxtool
 %attr(755,root,root) /usr/%{cassandraX}/bin/cassandra-stress
-%attr(755,root,root) /usr/%{cassandraX}/bin/cqlsh
-%attr(755,root,root) /usr/%{cassandraX}/bin/cqlsh.py
 %attr(755,root,root) /usr/%{cassandraX}/bin/debug-cql
 %attr(755,root,root) /usr/%{cassandraX}/bin/fqltool
 %attr(755,root,root) /usr/%{cassandraX}/bin/generatetokens
@@ -159,8 +161,6 @@ exit 0
 %attr(755,%{username},%{username}) %config(noreplace) /var/lib/%{cassandraX}/*
 %attr(755,%{username},%{username}) /var/log/%{cassandraX}*
 %attr(755,%{username},%{username}) /var/run/%{cassandraX}*
-%{python_sitelib}/cqlshlib/
-%{python_sitelib}/cassandra_pylib*.egg-info
 
 %package tools
 Summary:       Extra tools for Cassandra. Cassandra is a highly scalable, eventually consistent, distributed, structured key-value store.
@@ -188,6 +188,19 @@ This package contains extra tools for working with Cassandra clusters.
 %attr(755,root,root) /usr/%{cassandraX}/bin/fqltool
 %attr(755,root,root) /usr/%{cassandraX}/bin/generatetokens
 
+%package cqlsh
+Summary:       Command-line client for Cassandra
+Group:         Development/Libraries
+Conflicts:     cassandra
+
+%description cqlsh
+Cqlsh is a CLI tool for executing queries against Cassandra.
+
+%files cqlsh
+%attr(755,root,root) /usr/bin/cqlsh
+%attr(755,root,root) /usr/bin/cqlsh.py
+%{python_sitelib}/cqlshlib/
+%{python_sitelib}/cassandra_pylib*.egg-info
 
 %changelog
 * Mon Dec 05 2016 Michael Shuler <mshuler@apache.org>
