@@ -1,6 +1,4 @@
 %define __jar_repack %{nil}
-# Turn off the brp-python-bytecompile script
-%global __os_install_post %(echo '%{__os_install_post}' | sed -e 's!/usr/lib[^[:space:]]*/brp-python-bytecompile[[:space:]].*$!!g')
 
 # rpmbuild should not barf when it spots we ship
 # binary executable files in our 'noarch' package
@@ -28,7 +26,6 @@ BuildRequires: ant >= 1.9
 BuildRequires: ant-junit >= 1.9
 
 Requires:      jre >= 1.8.0
-Requires:      python(abi) >= 2.7
 Requires(pre): user(cassandra)
 Requires(pre): group(cassandra)
 Requires(pre): shadow-utils
@@ -66,7 +63,6 @@ mkdir -p %{buildroot}/var/lib/%{cassandraX}/saved_caches
 mkdir -p %{buildroot}/var/lib/%{cassandraX}/hints
 mkdir -p %{buildroot}/var/run/%{cassandraX}
 mkdir -p %{buildroot}/var/log/%{cassandraX}
-( cd pylib && python2.7 setup.py install --no-compile --root %{buildroot}; )
 
 # patches for data and log paths
 patch -p1 < debian/patches/001cassandra_yaml_dirs.dpatch
@@ -79,6 +75,7 @@ rm -f conf/*.ps1
 rm -f bin/*.bat
 rm -f bin/*.orig
 rm -f bin/*.ps1
+rm -f bin/cqlsh*
 rm -f bin/cassandra.in.sh
 rm -f lib/sigar-bin/*winnt*  # strip segfaults on dll..
 rm -f tools/bin/*.bat
@@ -118,8 +115,6 @@ exit 0
 %defattr(0644,root,root,0755)
 %doc CHANGES.txt LICENSE.txt README.asc NEWS.txt NOTICE.txt CASSANDRA-14092.txt
 %attr(755,root,root) /usr/%{cassandraX}/bin/cassandra-stress
-%attr(755,root,root) /usr/%{cassandraX}/bin/cqlsh
-%attr(755,root,root) /usr/%{cassandraX}/bin/cqlsh.py
 %attr(755,root,root) /usr/%{cassandraX}/bin/debug-cql
 %attr(755,root,root) /usr/%{cassandraX}/bin/nodetool
 %attr(755,root,root) /usr/%{cassandraX}/bin/sstableloader
@@ -134,8 +129,6 @@ exit 0
 %attr(755,%{username},%{username}) %config(noreplace) /var/lib/%{cassandraX}/*
 %attr(755,%{username},%{username}) /var/log/%{cassandraX}*
 %attr(755,%{username},%{username}) /var/run/%{cassandraX}*
-/usr/lib/python2.7/site-packages/cqlshlib/
-/usr/lib/python2.7/site-packages/cassandra_pylib*.egg-info
 
 %package tools
 Summary:       Extra tools for Cassandra. Cassandra is a highly scalable, eventually consistent, distributed, structured key-value store.
