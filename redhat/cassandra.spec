@@ -103,6 +103,10 @@ rm -f bin/stop-server
 rm -f bin/*.orig
 rm -f bin/cassandra.in.sh
 rm -f lib/sigar-bin/*winnt*  # strip segfaults on dll..
+rm -f lib/sigar-bin/*sparc*
+rm -f lib/sigar-bin/*s390x*
+rm -f lib/sigar-bin/*ppc*
+rm -f lib/sigar-bin/*ia64*
 rm -f tools/bin/cassandra.in.sh
 
 # copy default configs
