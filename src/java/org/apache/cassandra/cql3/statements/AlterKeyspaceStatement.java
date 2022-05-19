@@ -17,6 +17,11 @@
  */
 package org.apache.cassandra.cql3.statements;
 
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.apache.cassandra.auth.Permission;
 import org.apache.cassandra.config.Schema;
 import org.apache.cassandra.config.SchemaConstants;
@@ -60,6 +65,9 @@ public class AlterKeyspaceStatement extends SchemaAlteringStatement
         if (SchemaConstants.isLocalSystemKeyspace(ksm.name))
             throw new InvalidRequestException("Cannot alter system keyspace");
 
+
+
+
         attrs.validate();
 
         if (attrs.getReplicationStrategyClass() == null && !attrs.getReplicationOptions().isEmpty())
@@ -70,7 +78,11 @@ public class AlterKeyspaceStatement extends SchemaAlteringStatement
             // The strategy is validated through KSMetaData.validate() in announceKeyspaceUpdate below.
             // However, for backward compatibility with thrift, this doesn't validate unexpected options yet,
             // so doing proper validation here.
-            KeyspaceParams params = attrs.asAlteredKeyspaceParams(ksm.params);
+            final KeyspaceParams inputParams = attrs.asAlteredKeyspaceParams(ksm.params);
+            final Logger logger = LoggerFactory.getLogger(this.getClass());
+            final Map<String, String> tunedUp = new TuneUpReplicationFactor(logger).apply(this.name, inputParams);
+            final KeyspaceParams params = KeyspaceParams.create(inputParams.durableWrites, tunedUp);
+
             params.validate(name);
             if (params.replication.klass.equals(LocalStrategy.class))
                 throw new ConfigurationException("Unable to use given strategy class: LocalStrategy is reserved for internal use.");

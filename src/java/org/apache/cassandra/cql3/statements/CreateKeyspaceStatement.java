@@ -17,7 +17,11 @@
  */
 package org.apache.cassandra.cql3.statements;
 
+import java.util.Map;
 import java.util.regex.Pattern;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.apache.cassandra.auth.*;
 import org.apache.cassandra.config.DatabaseDescriptor;
@@ -90,15 +94,27 @@ public class CreateKeyspaceStatement extends SchemaAlteringStatement
         // The strategy is validated through KSMetaData.validate() in announceNewKeyspace below.
         // However, for backward compatibility with thrift, this doesn't validate unexpected options yet,
         // so doing proper validation here.
-        KeyspaceParams params = attrs.asNewKeyspaceParams();
+        KeyspaceParams inputParams = attrs.asNewKeyspaceParams();
+
+        final Logger logger = LoggerFactory.getLogger(this.getClass());
+        final Map<String, String> tunedUp = new TuneUpReplicationFactor(logger).apply(this.name, inputParams);
+        final KeyspaceParams params = KeyspaceParams.create(inputParams.durableWrites, tunedUp);
+
+
         params.validate(name);
         if (params.replication.klass.equals(LocalStrategy.class))
             throw new ConfigurationException("Unable to use given strategy class: LocalStrategy is reserved for internal use.");
     }
 
     public Event.SchemaChange announceMigration(QueryState queryState, boolean isLocalOnly) throws RequestValidationException
+
     {
-        KeyspaceMetadata ksm = KeyspaceMetadata.create(name, attrs.asNewKeyspaceParams());
+        final KeyspaceParams inputParams = attrs.asNewKeyspaceParams();
+        final Logger logger = LoggerFactory.getLogger(this.getClass());
+        final Map<String, String> tunedUp = new TuneUpReplicationFactor(logger).apply(this.name, inputParams);
+        final KeyspaceParams params = KeyspaceParams.create(inputParams.durableWrites, tunedUp);
+
+        KeyspaceMetadata ksm = KeyspaceMetadata.create(name, params);
         try
         {
             MigrationManager.announceNewKeyspace(ksm, isLocalOnly);
