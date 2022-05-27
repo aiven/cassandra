@@ -865,4 +865,10 @@ public interface StorageServiceMBean extends NotificationEmitter
 
     public Long getRepairRpcTimeout();
     public void setRepairRpcTimeout(Long timeoutInMillis);
+
+    boolean isReplicationFactorUptuningEnabled();
+
+    void enableReplicationFactorUptuning();
+
+    void disableReplicationFactorUptuning();
 }
