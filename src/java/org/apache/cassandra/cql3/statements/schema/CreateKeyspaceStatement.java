@@ -18,10 +18,10 @@
 package org.apache.cassandra.cql3.statements.schema;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import com.google.common.collect.ImmutableSet;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +36,7 @@ import org.apache.cassandra.cql3.CQLStatement;
 import org.apache.cassandra.exceptions.AlreadyExistsException;
 import org.apache.cassandra.locator.LocalStrategy;
 import org.apache.cassandra.schema.KeyspaceMetadata;
+import org.apache.cassandra.schema.KeyspaceParams;
 import org.apache.cassandra.schema.KeyspaceParams.Option;
 import org.apache.cassandra.schema.Keyspaces;
 import org.apache.cassandra.schema.Keyspaces.KeyspacesDiff;
@@ -51,6 +52,7 @@ public final class CreateKeyspaceStatement extends AlterSchemaStatement
     private final KeyspaceAttributes attrs;
     private final boolean ifNotExists;
     private final HashSet<String> clientWarnings = new HashSet<>();
+    public final static String REPLICATION_FACTOR = "replication_factor";
 
     public CreateKeyspaceStatement(String keyspaceName, KeyspaceAttributes attrs, boolean ifNotExists)
     {
@@ -74,7 +76,11 @@ public final class CreateKeyspaceStatement extends AlterSchemaStatement
             throw new AlreadyExistsException(keyspaceName);
         }
 
-        KeyspaceMetadata keyspace = KeyspaceMetadata.create(keyspaceName, attrs.asNewKeyspaceParams());
+        final KeyspaceParams inputKeyspaceParams = attrs.asNewKeyspaceParams();
+        final Map<String, String> tunedReplicationParams = TuneUpReplicationFactor.instance.apply(logger, keyspaceName, clientWarnings, inputKeyspaceParams);
+        final KeyspaceParams tunedKeyspaceParams = KeyspaceParams.create(inputKeyspaceParams.durableWrites, tunedReplicationParams);
+
+        KeyspaceMetadata keyspace = KeyspaceMetadata.create(keyspaceName, tunedKeyspaceParams);
 
         if (keyspace.params.replication.klass.equals(LocalStrategy.class))
             throw ire("Unable to use given strategy class: LocalStrategy is reserved for internal use.");
