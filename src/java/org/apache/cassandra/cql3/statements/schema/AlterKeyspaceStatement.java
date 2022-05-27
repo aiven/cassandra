@@ -19,9 +19,12 @@ package org.apache.cassandra.cql3.statements.schema;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import org.slf4j.helpers.NOPLogger;
 
 import org.apache.cassandra.audit.AuditLogContext;
 import org.apache.cassandra.audit.AuditLogEntryType;
@@ -39,6 +42,7 @@ import org.apache.cassandra.locator.LocalStrategy;
 import org.apache.cassandra.locator.ReplicationFactor;
 import org.apache.cassandra.schema.KeyspaceMetadata;
 import org.apache.cassandra.schema.KeyspaceMetadata.KeyspaceDiff;
+import org.apache.cassandra.schema.KeyspaceParams;
 import org.apache.cassandra.schema.Keyspaces;
 import org.apache.cassandra.schema.Keyspaces.KeyspacesDiff;
 import org.apache.cassandra.service.ClientState;
@@ -68,7 +72,11 @@ public final class AlterKeyspaceStatement extends AlterSchemaStatement
         if (null == keyspace)
             throw ire("Keyspace '%s' doesn't exist", keyspaceName);
 
-        KeyspaceMetadata newKeyspace = keyspace.withSwapped(attrs.asAlteredKeyspaceParams(keyspace.params));
+        final KeyspaceParams inputKeyspaceParams = attrs.asAlteredKeyspaceParams(keyspace.params);
+        final Map<String, String> tunedReplicationParams = TuneUpReplicationFactor.instance.apply(NOPLogger.NOP_LOGGER, keyspaceName, clientWarnings, inputKeyspaceParams);
+        final KeyspaceParams tunedKeyspaceParams = KeyspaceParams.create(inputKeyspaceParams.durableWrites, tunedReplicationParams);
+
+        KeyspaceMetadata newKeyspace = keyspace.withSwapped(tunedKeyspaceParams);
 
         if (newKeyspace.params.replication.klass.equals(LocalStrategy.class))
             throw ire("Unable to use given strategy class: LocalStrategy is reserved for internal use.");
