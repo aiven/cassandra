@@ -49,6 +49,7 @@ import com.google.common.util.concurrent.*;
 
 import org.apache.cassandra.config.ParameterizedClass;
 import org.apache.cassandra.cql3.QueryHandler;
+import org.apache.cassandra.cql3.statements.schema.TuneUpReplicationFactor;
 import org.apache.cassandra.dht.RangeStreamer.FetchReplica;
 import org.apache.cassandra.fql.FullQueryLogger;
 import org.apache.cassandra.fql.FullQueryLoggerOptions;
@@ -6041,4 +6042,20 @@ public class StorageService extends NotificationBroadcasterSupport implements IE
         logger.info("Changing keyspace count warn threshold from {} to {}", getKeyspaceCountWarnThreshold(), value);
         DatabaseDescriptor.setKeyspaceCountWarnThreshold(value);
     }
+
+    public boolean isReplicationFactorUptuningEnabled()
+    {
+        return DatabaseDescriptor.uptuningEnabled();
+    }
+
+    public void enableReplicationFactorUptuning()
+    {
+        DatabaseDescriptor.setUptuningEnabled(true);
+    }
+
+    public void disableReplicationFactorUptuning()
+    {
+        DatabaseDescriptor.setUptuningEnabled(false);
+    }
+
 }
