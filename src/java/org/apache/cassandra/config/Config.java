@@ -593,6 +593,8 @@ public class Config
         overrideLoadConfig = loadConfig;
     }
 
+    public volatile boolean replication_factor_uptuning_enabled = true;
+
     public enum CommitLogSync
     {
         periodic,
