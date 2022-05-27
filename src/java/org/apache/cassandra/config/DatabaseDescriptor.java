@@ -2605,4 +2605,13 @@ public class DatabaseDescriptor
     {
         return strictRuntimeChecks;
     }
+
+    public static boolean uptuningEnabled() {
+        return conf.replication_factor_uptuning_enabled;
+    }
+
+    public static void setUptuningEnabled(boolean uptuningEnabled) {
+        conf.replication_factor_uptuning_enabled = uptuningEnabled;
+    }
+
 }

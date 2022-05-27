@@ -28,6 +28,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import com.google.common.collect.ImmutableSet;
 import org.slf4j.Logger;
 
+import org.apache.cassandra.config.DatabaseDescriptor;
 import org.apache.cassandra.config.SchemaConstants;
 import org.apache.cassandra.cql3.functions.Function;
 import org.apache.cassandra.locator.NetworkTopologyStrategy;
@@ -42,24 +43,12 @@ public class TuneUpReplicationFactor
     public static final String REPLICATION_FACTOR = "replication_factor";
 
     public final static TuneUpReplicationFactor instance = new TuneUpReplicationFactor();
-    private final AtomicBoolean uptuningEnabled = new AtomicBoolean(true);
-
-    public boolean isUptuningEnabled()
-    {
-        return uptuningEnabled.get();
-    }
-
-    public void setUptuningEnabled(boolean uptuningEnabled)
-    {
-        this.uptuningEnabled.set(uptuningEnabled);
-    }
-
 
     public Map<String, String> apply(Logger logger, String keyspaceName, KeyspaceParams inputKeyspaceParams)
     {
         final Set<String> clientWarnings = new HashSet<>();
         final Map<String, String> replicationParams = inputKeyspaceParams.replication.asMap(); // new hashmap just created for client use, ok to modify
-        if (!uptuningEnabled.get() || SchemaConstants.isReplicatedSystemKeyspace(keyspaceName) || SchemaConstants.isLocalSystemKeyspace(keyspaceName))
+        if ((!DatabaseDescriptor.uptuningEnabled()) || SchemaConstants.isReplicatedSystemKeyspace(keyspaceName) || SchemaConstants.isLocalSystemKeyspace(keyspaceName))
         {
             return replicationParams;
         }
@@ -86,7 +75,8 @@ public class TuneUpReplicationFactor
         try
         {
             currentReplicationFactor = Integer.parseInt(replicationParams.get(REPLICATION_FACTOR));
-        } catch (NumberFormatException e)
+        }
+        catch (NumberFormatException e)
         {
             return;
         }
@@ -134,8 +124,10 @@ public class TuneUpReplicationFactor
                 int rf;
                 try
                 {
-                     rf = Integer.parseInt(v);
-                } catch (NumberFormatException e) {
+                    rf = Integer.parseInt(v);
+                }
+                catch (NumberFormatException e)
+                {
                     logger.warn("Found unparseable replication factor {}", v);
                     continue;
                 }

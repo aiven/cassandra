@@ -5338,4 +5338,19 @@ public class StorageService extends NotificationBroadcasterSupport implements IE
             Runtime.getRuntime().removeShutdownHook(drainOnShutdown);
         }
     }
+
+    public boolean isReplicationFactorUptuningEnabled()
+    {
+        return DatabaseDescriptor.uptuningEnabled();
+    }
+
+    public void enableReplicationFactorUptuning()
+    {
+        DatabaseDescriptor.setUptuningEnabled(true);
+    }
+
+    public void disableReplicationFactorUptuning()
+    {
+        DatabaseDescriptor.setUptuningEnabled(false);
+    }
 }
