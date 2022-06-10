@@ -696,4 +696,10 @@ public interface StorageServiceMBean extends NotificationEmitter
 
     /** Returns the max version that this node will negotiate for native protocol connections */
     public int getMaxNativeProtocolVersion();
+
+    boolean isReplicationFactorUptuningEnabled();
+
+    void enableReplicationFactorUptuning();
+
+    void disableReplicationFactorUptuning();
 }
