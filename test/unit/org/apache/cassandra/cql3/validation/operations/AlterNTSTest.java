@@ -75,7 +75,19 @@ public class AlterNTSTest extends CQLTester
         ClientWarn.instance.captureWarnings();
         execute("ALTER KEYSPACE " + ks + " WITH replication = {'class' : 'NetworkTopologyStrategy', '" + DATA_CENTER + "' : 1 }");
         warnings = ClientWarn.instance.getWarnings();
-        assertNull(warnings);
+        assertEquals(2, warnings.size());
+        Assertions.assertThat(warnings.get(0)).contains("Your replication factor 2 for keyspace " + ks + " is higher than the number of nodes 1 for datacenter " + DATA_CENTER);
+        Assertions.assertThat(warnings.get(1)).contains("insufficient");
+        Assertions.assertThat(warnings.get(1)).contains(DATA_CENTER);
+
+        // with transient replication
+        ClientWarn.instance.captureWarnings();
+        execute("ALTER KEYSPACE " + ks + " WITH replication = {'class' : 'NetworkTopologyStrategy', '" + DATA_CENTER + "' : '1/0' }");
+        warnings = ClientWarn.instance.getWarnings();
+        assertEquals(2, warnings.size());
+        Assertions.assertThat(warnings.get(0)).contains("Your replication factor 2 for keyspace " + ks + " is higher than the number of nodes 1 for datacenter " + DATA_CENTER);
+        Assertions.assertThat(warnings.get(1)).contains("insufficient");
+        Assertions.assertThat(warnings.get(1)).contains(DATA_CENTER);
 
         // SimpleStrategy
         ClientWarn.instance.captureWarnings();
@@ -98,6 +110,24 @@ public class AlterNTSTest extends CQLTester
         ClientWarn.instance.captureWarnings();
         execute("ALTER KEYSPACE " + ks + " WITH replication = { 'class' : 'SimpleStrategy', 'replication_factor' : 1 }");
         warnings = ClientWarn.instance.getWarnings();
-        assertNull(warnings);
+        assertEquals(2, warnings.size());
+        Assertions.assertThat(warnings.get(0)).contains("Your replication factor 2 for keyspace " + ks + " is higher than the number of nodes 1");
+        Assertions.assertThat(warnings.get(1)).contains("insufficient");
+
+        // tune up on creation
+        ClientWarn.instance.captureWarnings();
+        createKeyspace("CREATE KEYSPACE %s WITH replication = {'class' : 'NetworkTopologyStrategy', '" + DATA_CENTER + "' : 1 }");
+        warnings = ClientWarn.instance.getWarnings();
+        assertEquals(2, warnings.size()); // one warning is that RF is > DC size, the other is about the RF being insufficient
+        String insufficientRfWarning = warnings.get(1);
+        Assertions.assertThat(insufficientRfWarning).contains("insufficient");
+        Assertions.assertThat(insufficientRfWarning).contains(DATA_CENTER);
+
+        ClientWarn.instance.captureWarnings();
+        createKeyspace("CREATE KEYSPACE %s WITH replication = { 'class' : 'SimpleStrategy', 'replication_factor' : 1 }");
+        warnings = ClientWarn.instance.getWarnings();
+        assertEquals(2, warnings.size());
+        Assertions.assertThat(warnings.get(1)).contains("insufficient");
+
     }
 }
