@@ -116,7 +116,8 @@ public class OfflineTokenAllocator
     {
         private final FakeSnitch fakeSnitch;
         private final TokenMetadata fakeMetadata;
-        private final TokenAllocation allocation;
+        private final int rf;
+        private final int numTokens;
         private final Map<Integer, SummaryStatistics> lastCheckPoint = Maps.newHashMap();
         private final OutputHandler logger;
 
@@ -124,7 +125,8 @@ public class OfflineTokenAllocator
         {
             this.fakeSnitch = new FakeSnitch();
             this.fakeMetadata = new TokenMetadata(fakeSnitch).cloneWithNewPartitioner(partitioner);
-            this.allocation = TokenAllocation.create(fakeSnitch, fakeMetadata, rf, numTokens);
+            this.rf = rf;
+            this.numTokens = numTokens;
             this.logger = logger;
         }
 
@@ -136,15 +138,16 @@ public class OfflineTokenAllocator
             fakeMetadata.updateTopology(fakeNodeAddressAndPort);
 
             // Allocate tokens
+            TokenAllocation allocation = TokenAllocation.create(fakeSnitch, fakeMetadata, rf, numTokens);
             Collection<Token> tokens = allocation.allocate(fakeNodeAddressAndPort);
 
             // Validate ownership stats
-            validateAllocation(nodeId, rackId);
+            validateAllocation(allocation, nodeId, rackId);
 
             return new FakeNode(fakeNodeAddressAndPort, rackId, tokens);
         }
 
-        private void validateAllocation(int nodeId, int rackId)
+        private void validateAllocation(TokenAllocation allocation, int nodeId, int rackId)
         {
             SummaryStatistics newOwnership = allocation.getAllocationRingOwnership(SimpleSnitch.DATA_CENTER_NAME, Integer.toString(rackId));
             SummaryStatistics oldOwnership = lastCheckPoint.put(rackId, newOwnership);
