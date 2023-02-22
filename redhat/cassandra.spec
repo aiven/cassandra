@@ -7,6 +7,7 @@
 %define _binaries_in_noarch_packages_terminate_build   0
 
 %global username cassandra
+%global uid_offset 100
 
 %define relname apache-cassandra-%{version}
 %define cassandra_major_version 3
@@ -109,9 +110,16 @@ cp build/apache-cassandra-thrift-%{version}.jar %{buildroot}/usr/share/%{cassand
 %{__rm} -rf %{buildroot}
 
 %pre
-getent group %{username} >/dev/null || groupadd -r %{username}
+# offset username gid/uid a little to avoid clashes with some pre-created users
+getent group %{username} >/dev/null || groupadd -r \
+-K SYS_GID_MIN=$((`grep -v '#' /etc/login.defs | grep SYS_GID_MIN | tr -d -c [:digit:]`+%{uid_offset})) \
+-K SYS_GID_MAX=$((`grep -v '#' /etc/login.defs | grep SYS_GID_MAX | tr -d -c [:digit:]`-%{uid_offset})) \
+%{username}
 getent passwd %{username} >/dev/null || \
-useradd -d /var/lib/%{username} -g %{username} -M -r %{username}
+useradd -d /var/lib/%{username} -g %{username} -M -r \
+-K SYS_UID_MIN=$((`grep -v '#' /etc/login.defs | grep SYS_UID_MIN | tr -d -c [:digit:]`+%{uid_offset})) \
+-K SYS_UID_MAX=$((`grep -v '#' /etc/login.defs | grep SYS_UID_MAX | tr -d -c [:digit:]`-%{uid_offset})) \
+%{username}
 exit 0
 
 %files
