@@ -27,6 +27,7 @@
 %define __python /usr/bin/python3
 
 %global username cassandra
+%global uid_offset 100
 
 # input of ~alphaN, ~betaN, ~rcN package versions need to retain upstream '-alphaN, etc' version for sources
 %define upstream_version %(echo %{version} | sed -r 's/~/-/g')
@@ -135,9 +136,16 @@ cp build/apache-cassandra-%{upstream_version}.jar %{buildroot}/usr/share/%{cassa
 %{__rm} -rf %{buildroot}
 
 %pre
-getent group %{username} >/dev/null || groupadd -r %{username}
+# offset username gid/uid a little to avoid clashes with some pre-created users
+getent group %{username} >/dev/null || groupadd -r \
+-K SYS_GID_MIN=$((`grep -v '#' /etc/login.defs | grep SYS_GID_MIN | tr -d -c [:digit:]`+%{uid_offset})) \
+-K SYS_GID_MAX=$((`grep -v '#' /etc/login.defs | grep SYS_GID_MAX | tr -d -c [:digit:]`-%{uid_offset})) \
+%{username}
 getent passwd %{username} >/dev/null || \
-useradd -d /var/lib/%{username} -g %{username} -M -r %{username}
+useradd -d /var/lib/%{username} -g %{username} -M -r \
+-K SYS_UID_MIN=$((`grep -v '#' /etc/login.defs | grep SYS_UID_MIN | tr -d -c [:digit:]`+%{uid_offset})) \
+-K SYS_UID_MAX=$((`grep -v '#' /etc/login.defs | grep SYS_UID_MAX | tr -d -c [:digit:]`-%{uid_offset})) \
+%{username}
 exit 0
 
 %files
