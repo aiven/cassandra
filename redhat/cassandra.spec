@@ -79,18 +79,10 @@ ant clean jar -Dversion=%{upstream_version} -Drat.skip=true
 
 %install
 %{__rm} -rf %{buildroot}
-mkdir -p %{buildroot}/%{_sysconfdir}/%{cassandraX}
 mkdir -p %{buildroot}/usr/share/%{cassandraX}
 mkdir -p %{buildroot}/usr/share/%{cassandraX}/lib
-mkdir -p %{buildroot}/%{_sysconfdir}/%{cassandraX}/default.conf
 mkdir -p %{buildroot}/usr/%{cassandraX}/sbin
 mkdir -p %{buildroot}/usr/%{cassandraX}/bin
-mkdir -p %{buildroot}/var/lib/%{cassandraX}/commitlog
-mkdir -p %{buildroot}/var/lib/%{cassandraX}/data
-mkdir -p %{buildroot}/var/lib/%{cassandraX}/saved_caches
-mkdir -p %{buildroot}/var/lib/%{cassandraX}/hints
-mkdir -p %{buildroot}/var/run/%{cassandraX}
-mkdir -p %{buildroot}/var/log/%{cassandraX}
 ( cd pylib && %{__python} setup.py install --no-compile --root %{buildroot}; )
 
 # patches for data and log paths
@@ -108,12 +100,6 @@ rm -f lib/sigar-bin/*s390x*
 rm -f lib/sigar-bin/*ppc*
 rm -f lib/sigar-bin/*ia64*
 rm -f tools/bin/cassandra.in.sh
-
-# copy default configs
-cp -pr conf/* %{buildroot}/%{_sysconfdir}/%{cassandraX}/default.conf/
-
-# step on default config with our redhat one
-cp -p redhat/%{username}.in.sh %{buildroot}/usr/share/%{cassandraX}/%{username}.in.sh
 
 # copy cassandra bundled libs
 cp -pr lib/* %{buildroot}/usr/share/%{cassandraX}/lib/
@@ -135,18 +121,6 @@ cp build/apache-cassandra-%{upstream_version}.jar %{buildroot}/usr/share/%{cassa
 %clean
 %{__rm} -rf %{buildroot}
 
-%pre
-# offset username gid/uid a little to avoid clashes with some pre-created users
-getent group %{username} >/dev/null || groupadd -r \
--K SYS_GID_MIN=$((`grep -v '#' /etc/login.defs | grep SYS_GID_MIN | tr -d -c [:digit:]`+%{uid_offset})) \
--K SYS_GID_MAX=$((`grep -v '#' /etc/login.defs | grep SYS_GID_MAX | tr -d -c [:digit:]`-%{uid_offset})) \
-%{username}
-getent passwd %{username} >/dev/null || \
-useradd -d /var/lib/%{username} -g %{username} -M -r \
--K SYS_UID_MIN=$((`grep -v '#' /etc/login.defs | grep SYS_UID_MIN | tr -d -c [:digit:]`+%{uid_offset})) \
--K SYS_UID_MAX=$((`grep -v '#' /etc/login.defs | grep SYS_UID_MAX | tr -d -c [:digit:]`-%{uid_offset})) \
-%{username}
-exit 0
 
 %files
 %defattr(0644,root,root,0755)
@@ -168,10 +142,6 @@ exit 0
 %attr(755,root,root) /usr/%{cassandraX}/bin/stop-server
 %attr(755,root,root) /usr/%{cassandraX}/sbin/
 /usr/share/%{cassandraX}*
-%config(noreplace) /%{_sysconfdir}/%{cassandraX}
-%attr(755,%{username},%{username}) %config(noreplace) /var/lib/%{cassandraX}/*
-%attr(755,%{username},%{username}) /var/log/%{cassandraX}*
-%attr(755,%{username},%{username}) /var/run/%{cassandraX}*
 %{python_sitelib}/cqlshlib/
 %{python_sitelib}/cassandra_pylib*.egg-info
 
