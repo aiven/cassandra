@@ -1579,6 +1579,11 @@ public class DatabaseDescriptor
         }
     }
 
+    public static boolean skipBootstrapStreaming()
+    {
+        return conf.skip_bootstrap_streaming;
+    }
+
     public static Collection<String> getReplaceTokens()
     {
         return tokensFromString(System.getProperty(Config.PROPERTY_PREFIX + "replace_token", null));
