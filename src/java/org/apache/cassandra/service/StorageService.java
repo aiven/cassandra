@@ -1871,6 +1871,12 @@ public class StorageService extends NotificationBroadcasterSupport implements IE
         // Force disk boundary invalidation now that local tokens are set
         invalidateDiskBoundaries();
 
+        if (DatabaseDescriptor.skipBootstrapStreaming())
+        {
+            bootstrapFinished();
+            logger.info("Bootstrap skipped for tokens {}", tokens);
+            return true;
+        }
         Future<StreamState> bootstrapStream = startBootstrap(tokens);
         try
         {
