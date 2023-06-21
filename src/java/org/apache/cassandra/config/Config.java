@@ -92,6 +92,7 @@ public class Config
     public Integer allocate_tokens_for_local_replication_factor = null;
 
     public boolean skip_bootstrap_streaming = false;
+    public String replace_address_first_boot = null;
 
     public long native_transport_idle_timeout_in_ms = 0L;
 
