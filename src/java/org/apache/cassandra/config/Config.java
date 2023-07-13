@@ -91,6 +91,9 @@ public class Config
     /** Triggers automatic allocation of tokens if set, based on the provided replica count for a datacenter */
     public Integer allocate_tokens_for_local_replication_factor = null;
 
+    public boolean skip_bootstrap_streaming = false;
+    public String replace_address_first_boot = null;
+
     public long native_transport_idle_timeout_in_ms = 0L;
 
     public volatile long request_timeout_in_ms = 10000L;
