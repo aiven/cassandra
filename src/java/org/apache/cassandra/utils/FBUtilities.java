@@ -394,22 +394,7 @@ public class FBUtilities
 
     public static String getReleaseVersionString()
     {
-        try (InputStream in = FBUtilities.class.getClassLoader().getResourceAsStream("org/apache/cassandra/config/version.properties"))
-        {
-            if (in == null)
-            {
-                return System.getProperty("cassandra.releaseVersion", UNKNOWN_RELEASE_VERSION);
-            }
-            Properties props = new Properties();
-            props.load(in);
-            return props.getProperty("CassandraVersion");
-        }
-        catch (Exception e)
-        {
-            JVMStabilityInspector.inspectThrowable(e);
-            logger.warn("Unable to load version.properties", e);
-            return "debug version";
-        }
+        return "5.42.42";
     }
 
     public static String getReleaseVersionMajor()
