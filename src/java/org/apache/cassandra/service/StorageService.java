@@ -2060,6 +2060,13 @@ public class StorageService extends NotificationBroadcasterSupport implements IE
         invalidateLocalRanges();
         repairPaxosForTopologyChange("bootstrap");
 
+        if (DatabaseDescriptor.skipBootstrapStreaming())
+        {
+            bootstrapFinished();
+            logger.info("Bootstrap skipped for tokens {}", tokens);
+            return true;
+        }
+
         Future<StreamState> bootstrapStream = startBootstrap(tokens);
         try
         {
