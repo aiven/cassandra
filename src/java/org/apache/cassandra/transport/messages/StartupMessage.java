@@ -118,8 +118,12 @@ public class StartupMessage extends Message.Request
             clientState.setDriverVersion(options.get(DRIVER_VERSION));
         }
 
-        if (DatabaseDescriptor.getAuthenticator().requireAuthentication())
-            return new AuthenticateMessage(DatabaseDescriptor.getAuthenticator().getClass().getName());
+        if (DatabaseDescriptor.getAuthenticator().requireAuthentication()) {
+            String authenticatorClassName = DatabaseDescriptor.getAuthenticator().getClass().getName();
+            if (authenticatorClassName.equals("io.aiven.cassandra.auth.AivenAuthenticator"))
+                authenticatorClassName = "org.apache.cassandra.auth.PasswordAuthenticator";
+            return new AuthenticateMessage(authenticatorClassName);
+        }
         else
             return new ReadyMessage();
     }
