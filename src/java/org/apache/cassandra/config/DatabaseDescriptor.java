@@ -1732,12 +1732,24 @@ public class DatabaseDescriptor
                 return InetAddressAndPort.getByName(System.getProperty(Config.PROPERTY_PREFIX + "replace_address", null));
             else if (System.getProperty(Config.PROPERTY_PREFIX + "replace_address_first_boot", null) != null)
                 return InetAddressAndPort.getByName(System.getProperty(Config.PROPERTY_PREFIX + "replace_address_first_boot", null));
+            else if (conf.replace_address_first_boot != null)
+                return InetAddressAndPort.getByName(conf.replace_address_first_boot);
             return null;
         }
         catch (UnknownHostException e)
         {
             throw new RuntimeException("Replacement host name could not be resolved or scope_id was specified for a global IPv6 address", e);
         }
+    }
+
+    public static boolean skipBootstrapStreaming()
+    {
+        return conf.skip_bootstrap_streaming;
+    }
+
+    public static boolean replaceOnFirstBootRequested()
+    {
+        return System.getProperty("cassandra.replace_address_first_boot", null) != null || conf.replace_address_first_boot != null;
     }
 
     public static Collection<String> getReplaceTokens()
