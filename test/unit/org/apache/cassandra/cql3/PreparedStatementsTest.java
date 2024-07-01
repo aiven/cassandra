@@ -22,6 +22,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.datastax.driver.core.Cluster;
@@ -29,6 +30,7 @@ import com.datastax.driver.core.PreparedStatement;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.core.exceptions.SyntaxError;
+import org.apache.cassandra.config.DatabaseDescriptor;
 import org.apache.cassandra.db.ConsistencyLevel;
 import org.apache.cassandra.exceptions.PreparedQueryNotFoundException;
 import org.apache.cassandra.index.StubIndex;
@@ -48,6 +50,18 @@ public class PreparedStatementsTest extends CQLTester
     private static final String createKsStatement = "CREATE KEYSPACE " + KEYSPACE +
                                                     " WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 1 };";
     private static final String dropKsStatement = "DROP KEYSPACE IF EXISTS " + KEYSPACE;
+
+
+    /**
+     * Prevent the {@link org.apache.cassandra.cql3.statements.schema.TuneUpReplicationFactor} from
+     * uptuning the replication factor to ensure that the test can reliably check the assertions.
+     */
+    @BeforeClass
+    public static void setUpClass()
+    {
+        DatabaseDescriptor.setUptuningEnabled(false);
+        CQLTester.setUpClass();
+    }
 
     @Before
     public void setup()
