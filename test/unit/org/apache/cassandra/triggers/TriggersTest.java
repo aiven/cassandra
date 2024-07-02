@@ -25,6 +25,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import org.apache.cassandra.SchemaLoader;
+import org.apache.cassandra.config.DatabaseDescriptor;
 import org.apache.cassandra.schema.Schema;
 import org.apache.cassandra.cql3.QueryProcessor;
 import org.apache.cassandra.cql3.UntypedResultSet;
@@ -59,6 +60,7 @@ public class TriggersTest
     public void setup() throws Exception
     {
         StorageService.instance.initServer(0);
+        DatabaseDescriptor.setUptuningEnabled(false);
 
         String cql = String.format("CREATE KEYSPACE IF NOT EXISTS %s " +
                                    "WITH REPLICATION = {'class': 'SimpleStrategy', 'replication_factor': 1}",

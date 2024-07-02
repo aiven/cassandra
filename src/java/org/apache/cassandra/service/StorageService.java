@@ -71,20 +71,10 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Ordering;
-import com.google.common.collect.Sets;
-import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.MoreExecutors;
-import com.google.common.util.concurrent.RateLimiter;
-import com.google.common.util.concurrent.Uninterruptibles;
+import com.google.common.collect.*;
+import com.google.common.util.concurrent.*;
+
+import org.apache.cassandra.cql3.statements.schema.TuneUpReplicationFactor;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -941,7 +931,7 @@ public class StorageService extends NotificationBroadcasterSupport implements IE
 
     private boolean isReplacing()
     {
-        if (System.getProperty("cassandra.replace_address_first_boot", null) != null && SystemKeyspace.bootstrapComplete())
+        if (DatabaseDescriptor.replaceOnFirstBootRequested() && SystemKeyspace.bootstrapComplete())
         {
             logger.info("Replace address on first boot requested; this node is already bootstrapped");
             return false;
@@ -1872,6 +1862,12 @@ public class StorageService extends NotificationBroadcasterSupport implements IE
         // Force disk boundary invalidation now that local tokens are set
         invalidateDiskBoundaries();
 
+        if (DatabaseDescriptor.skipBootstrapStreaming())
+        {
+            bootstrapFinished();
+            logger.info("Bootstrap skipped for tokens {}", tokens);
+            return true;
+        }
         Future<StreamState> bootstrapStream = startBootstrap(tokens);
         try
         {
@@ -6212,4 +6208,18 @@ public class StorageService extends NotificationBroadcasterSupport implements IE
         logger.info("RepairRpcTimeout set to {}ms via JMX", timeoutInMillis);
     }
 
+    public boolean isReplicationFactorUptuningEnabled()
+    {
+        return DatabaseDescriptor.uptuningEnabled();
+    }
+
+    public void enableReplicationFactorUptuning()
+    {
+        DatabaseDescriptor.setUptuningEnabled(true);
+    }
+
+    public void disableReplicationFactorUptuning()
+    {
+        DatabaseDescriptor.setUptuningEnabled(false);
+    }
 }
