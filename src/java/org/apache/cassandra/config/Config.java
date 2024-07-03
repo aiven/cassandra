@@ -54,7 +54,7 @@ import static org.apache.cassandra.config.CassandraRelevantProperties.SKIP_PAXOS
  * <p>
  * Properties declared as volatile can be mutated via JMX.
  */
-public class Config
+public class Config extends AivenConfig
 {
     private static final Logger logger = LoggerFactory.getLogger(Config.class);
 
@@ -132,6 +132,8 @@ public class Config
     public String allocate_tokens_for_keyspace = null;
     /** Triggers automatic allocation of tokens if set, based on the provided replica count for a datacenter */
     public Integer allocate_tokens_for_local_replication_factor = null;
+
+    public String replace_address_first_boot = null;
 
     @Replaces(oldName = "native_transport_idle_timeout_in_ms", converter = Converters.MILLIS_DURATION_LONG, deprecated = true)
     public DurationSpec.LongMillisecondsBound native_transport_idle_timeout = new DurationSpec.LongMillisecondsBound("0ms");

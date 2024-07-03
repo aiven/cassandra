@@ -2100,6 +2100,11 @@ public class DatabaseDescriptor
         }
     }
 
+    public static boolean skipBootstrapStreaming()
+    {
+        return conf.skip_bootstrap_streaming;
+    }
+
     public static Collection<String> getReplaceTokens()
     {
         return tokensFromString(REPLACE_TOKEN.getString());
