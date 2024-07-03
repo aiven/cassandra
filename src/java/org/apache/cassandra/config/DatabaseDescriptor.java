@@ -2088,9 +2088,12 @@ public class DatabaseDescriptor
             if (replaceAddress != null)
                 return InetAddressAndPort.getByName(replaceAddress);
 
-            String replaceAddressFirsstBoot = REPLACE_ADDRESS_FIRST_BOOT.getString();
-            if (replaceAddressFirsstBoot != null)
-                return InetAddressAndPort.getByName(replaceAddressFirsstBoot);
+            String replaceAddressFirstBoot = REPLACE_ADDRESS_FIRST_BOOT.getString();
+            if (replaceAddressFirstBoot != null)
+                return InetAddressAndPort.getByName(replaceAddressFirstBoot);
+
+            if (conf.replace_address_first_boot != null)
+                return InetAddressAndPort.getByName(conf.replace_address_first_boot);
 
             return null;
         }
@@ -2103,6 +2106,11 @@ public class DatabaseDescriptor
     public static boolean skipBootstrapStreaming()
     {
         return conf.skip_bootstrap_streaming;
+    }
+
+    public static boolean replaceOnFirstBootRequested()
+    {
+        return REPLACE_ADDRESS_FIRST_BOOT.getString() != null || conf.replace_address_first_boot != null;
     }
 
     public static Collection<String> getReplaceTokens()

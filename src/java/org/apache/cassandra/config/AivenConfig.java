@@ -29,4 +29,9 @@ public class AivenConfig
      * The exchange of SSTables during replacement is not necessary.
      * */
     public boolean skip_bootstrap_streaming = false;
+
+    /**
+     * Allow to set replace_address_first_boot in Cassandra properties.
+     */
+    public String replace_address_first_boot = null;
 }

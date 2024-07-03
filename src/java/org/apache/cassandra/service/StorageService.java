@@ -257,7 +257,6 @@ import static org.apache.cassandra.config.CassandraRelevantProperties.PAXOS_REPA
 import static org.apache.cassandra.config.CassandraRelevantProperties.PAXOS_REPAIR_ON_TOPOLOGY_CHANGE_RETRY_DELAY_SECONDS;
 import static org.apache.cassandra.config.CassandraRelevantProperties.REPLACEMENT_ALLOW_EMPTY;
 import static org.apache.cassandra.config.CassandraRelevantProperties.REPLACE_ADDRESS;
-import static org.apache.cassandra.config.CassandraRelevantProperties.REPLACE_ADDRESS_FIRST_BOOT;
 import static org.apache.cassandra.config.CassandraRelevantProperties.RESET_BOOTSTRAP_PROGRESS;
 import static org.apache.cassandra.config.CassandraRelevantProperties.START_GOSSIP;
 import static org.apache.cassandra.config.CassandraRelevantProperties.TEST_WRITE_SURVEY;
@@ -1055,7 +1054,7 @@ public class StorageService extends NotificationBroadcasterSupport implements IE
         if (replacing)
             return true;
 
-        if (REPLACE_ADDRESS_FIRST_BOOT.getString() != null && SystemKeyspace.bootstrapComplete())
+        if (DatabaseDescriptor.replaceOnFirstBootRequested() && SystemKeyspace.bootstrapComplete())
         {
             logger.info("Replace address on the first boot requested; this node is already bootstrapped");
             return false;
