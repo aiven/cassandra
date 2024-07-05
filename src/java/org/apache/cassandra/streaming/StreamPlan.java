@@ -56,6 +56,11 @@ public class StreamPlan
         this(streamOperation, 1, false, NO_PENDING_REPAIR, PreviewKind.NONE);
     }
 
+    public StreamPlan(StreamOperation streamOperation, int connectionsPerHost)
+    {
+        this(streamOperation, connectionsPerHost, false, NO_PENDING_REPAIR, PreviewKind.NONE);
+    }
+
     public StreamPlan(StreamOperation streamOperation, boolean connectSequentially)
     {
         this(streamOperation, 1, connectSequentially, NO_PENDING_REPAIR, PreviewKind.NONE);

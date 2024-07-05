@@ -5990,7 +5990,7 @@ public class StorageService extends NotificationBroadcasterSupport implements IE
             sessionsToStreamByKeyspace.put(keyspace, replicasPerEndpoint.build());
         }
 
-        StreamPlan streamPlan = new StreamPlan(StreamOperation.DECOMMISSION);
+        StreamPlan streamPlan = new StreamPlan(StreamOperation.DECOMMISSION, DatabaseDescriptor.getStreamingConnectionsPerHost());
 
         // Vinculate StreamStateStore to current StreamPlan to update transferred rangeas per StreamSession
         streamPlan.listeners(streamStateStore);
