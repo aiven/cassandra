@@ -134,10 +134,13 @@ public class CassandraEntireSSTableStreamReader implements IStreamReader
                              prettyPrintMemory(totalSize));
             }
 
+            if (messageHeader.repairedAt > 0) {
+                logger.info("[Stream #{}] Rewriting repairedAt from {} to 0 for sstable #{}", session.planId(), messageHeader.repairedAt, fileSequenceNumber);
+            }
             UnaryOperator<StatsMetadata> transform = stats -> stats.mutateLevel(header.sstableLevel)
-                                                                   .mutateRepairedMetadata(messageHeader.repairedAt, messageHeader.pendingRepair, false);
+                                                                   .mutateRepairedMetadata(0, messageHeader.pendingRepair, false);
             String description = String.format("level %s and repairedAt time %s and pendingRepair %s",
-                                               header.sstableLevel, messageHeader.repairedAt, messageHeader.pendingRepair);
+                                               header.sstableLevel, 0, messageHeader.pendingRepair);
             writer.descriptor.getMetadataSerializer().mutate(writer.descriptor, description, transform);
             return writer;
         }

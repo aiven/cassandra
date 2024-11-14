@@ -135,7 +135,10 @@ public class CassandraStreamReader implements IStreamReader
         try (StreamCompressionInputStream streamCompressionInputStream = new StreamCompressionInputStream(inputPlus, current_version))
         {
             TrackedDataInputPlus in = new TrackedDataInputPlus(streamCompressionInputStream);
-            writer = createWriter(cfs, totalSize, repairedAt, pendingRepair, format);
+            if (repairedAt > 0) {
+                logger.info("[Stream #{}] Rewriting repairedAt from {} to 0 for sstable #{}", session.planId(), repairedAt, fileSeqNum);
+            }
+            writer = createWriter(cfs, totalSize, 0, pendingRepair, format);
             deserializer = getDeserializer(cfs.metadata(), in, inputVersion, session, writer);
             String sequenceName = writer.getFilename() + '-' + fileSeqNum;
             long lastBytesRead = 0;
